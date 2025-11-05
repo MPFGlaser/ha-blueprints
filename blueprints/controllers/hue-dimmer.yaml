@@ -1,0 +1,39 @@
+blueprint:
+  domain: automation
+  name: Z2M - Philips Hue Dimmer Switch - Multi-Press and Hold
+  author: Max Glaser
+  description: >-
+    Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions. 
+    Might support 324131092621 as well, but this is not tested.
+  input:
+    device:
+      name: Philips Hue Dimmer Switch (929002398602)
+      description: List of available Philips Hue Dimmer Switches
+      selector:
+        device:
+          integration: mqtt
+          manufacturer: Signify Netherlands B.V.
+          model: 929002398602
+          multiple: false
+    helper_on_button_presses:
+      name: (Required) Helper - "On" Button Presses
+      description: Input Counter used to store the amount of clicks fired by the controller.
+        Manually create a counter helper entity for this, with minimum 0 and maximum 5. Step size should be 1.
+      default: ''
+      selector:
+        entity:
+          domain:
+          - input_counter
+          multiple: false
+          reorder: false
+mode: single
+max_exceeded: silent
+variables:
+  device_id: !input device
+triggers:
+  - domain: mqtt
+    device_id: {{ device_id }}
+    type: action
+    subtype: off_press_release
+    trigger: device
+    id: off_click
