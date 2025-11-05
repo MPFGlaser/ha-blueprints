@@ -13,7 +13,7 @@ blueprint:
         device:
           integration: mqtt
           manufacturer: Signify Netherlands B.V.
-          model: 929002398602
+          model: '929002398602'
           multiple: false
     helper_on_button_presses:
       name: (Required) Helper - "On" Button Presses
