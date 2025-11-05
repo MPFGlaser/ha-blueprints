@@ -12,7 +12,7 @@ blueprint:
       selector:
         device:
           integration: mqtt
-          manufacturer: Signify Netherlands B.V.
+          manufacturer: Philips
           model: '929002398602'
           multiple: false
     helper_on_button_presses:
