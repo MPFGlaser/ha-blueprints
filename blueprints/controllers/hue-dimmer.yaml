@@ -14,7 +14,7 @@ blueprint:
           filter:
             - integration: mqtt
               manufacturer: Philips
-              model:  Hue dimmer switch (929002398602)
+              model: Hue dimmer switch (929002398602)
           multiple: false
     helper_on_button_presses:
       name: (Required) Helper - "On" Button Presses
