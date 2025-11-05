@@ -2,38 +2,75 @@ blueprint:
   domain: automation
   name: Z2M - Philips Hue Dimmer Switch - Multi-Press and Hold
   author: Max Glaser
-  description: >-
-    Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions. 
-    Might support 324131092621 as well, but this is not tested.
+  description: 
+   "Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.\n
+    Might support 324131092621 as well, but this is not tested."
   input:
-    device:
-      name: Philips Hue Dimmer Switch (929002398602)
+    dimmer_switch:
+      name: Philips Hue Dimmer Switch
       description: List of available Philips Hue Dimmer Switches
       selector:
         device:
           filter:
             - integration: mqtt
               manufacturer: Philips
-              model: Hue dimmer switch (929002398602)
+              model: Hue dimmer switch
           multiple: false
     helper_on_button_presses:
       name: (Required) Helper - "On" Button Presses
-      description: Input Counter used to store the amount of clicks fired by the controller.
-        Manually create a counter helper entity for this, with minimum 0 and maximum 5. Step size should be 1.
-      default: ''
+      description:
+        Input Counter used to store the amount of clicks fired by the controller.
+        Manually create a counter helper entity for this, with minimum 0, maximum 5, initial value 0, and step size 1.
+      default: ""
       selector:
         entity:
           domain:
-          - input_counter
+            - counter
           multiple: false
           reorder: false
+    helper_up_button_presses:
+      name: (Required) Helper - "Up" Button Presses
+      description:
+        Input Counter used to store the amount of clicks fired by the controller.
+        Manually create a counter helper entity for this, with minimum 0, maximum 5, initial value 0, and step size 1.
+      default: ""
+      selector:
+        entity:
+          domain:
+            - counter
+          multiple: false
+          reorder: false       
+    helper_down_button_presses:
+      name: (Required) Helper - "Down" Button Presses
+      description:
+        Input Counter used to store the amount of clicks fired by the controller.
+        Manually create a counter helper entity for this, with minimum 0, maximum 5, initial value 0, and step size 1.
+      default: ""
+      selector:
+        entity:
+          domain:
+            - counter
+          multiple: false
+          reorder: false   
+    helper_off_button_presses:
+      name: (Required) Helper - "Off"/"Hue" Button Presses
+      description:
+        Input Counter used to store the amount of clicks fired by the controller.
+        Manually create a counter helper entity for this, with minimum 0, maximum 5, initial value 0, and step size 1.
+      default: ""
+      selector:
+        entity:
+          domain:
+            - counter
+          multiple: false
+          reorder: false   
 mode: single
 max_exceeded: silent
 variables:
-  device_id: !input device
+  device_id: !input dimmer_switch
 triggers:
   - domain: mqtt
-    device_id: '{{ device_id }}'
+    device_id: "{{ device_id }}"
     type: action
     subtype: off_press_release
     trigger: device
