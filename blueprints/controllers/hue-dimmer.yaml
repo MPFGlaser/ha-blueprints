@@ -32,7 +32,7 @@ variables:
   device_id: !input device
 triggers:
   - domain: mqtt
-    device_id: '{{ device_id }}''
+    device_id: '{{ device_id }}'
     type: action
     subtype: off_press_release
     trigger: device
