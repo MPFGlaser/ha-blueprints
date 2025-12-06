@@ -1,10 +1,13 @@
 blueprint:
   domain: automation
-  name: Z2M - Philips Hue Dimmer Switch - Multi-Press and Hold
+  name: z2m - Philips Hue Dimmer Switch - Multi-Press and Hold
   author: Max Glaser
   description: 
-   "Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.\n
-    Might support 324131092621 as well, but this is not tested."
+    "Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.\n
+    Might support 324131092621 as well, but this is not tested.
+
+    Please note that each helper needs to be unique to each dimmer switch that you automate using this blueprint,
+    otherwise you might run into unintended behaviour."
   input:
     dimmer_switch:
       name: Philips Hue Dimmer Switch
