@@ -279,89 +279,93 @@ blueprint:
           default: []
           selector:
             action: {}  
-mode: single
+mode: restart
 max_exceeded: silent
 variables:
-  device_id: !input dimmer_switch
   helper_on_button_presses: !input helper_on_button_presses
   helper_up_button_presses: !input helper_up_button_presses
   helper_down_button_presses: !input helper_down_button_presses
   helper_off_button_presses: !input helper_off_button_presses
+  helper_press_delay: !input helper_press_delay
 triggers:
   # Button Presses
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: on_press_release
-    trigger: device
     id: on_click
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: up_press_release
-    trigger: device
     id: up_click
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: down_press_release
-    trigger: device
     id: down_click
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: off_press_release
-    trigger: device
     id: off_click
 
   # Button Holds
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: on_hold
-    trigger: device
     id: on_hold
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: up_hold
-    trigger: device
     id: up_hold
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: down_hold
-    trigger: device
     id: down_hold
-  - domain: mqtt
-    device_id: "{{ device_id }}"
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
     type: action
     subtype: off_hold
-    trigger: device
     id: off_hold
-
-  # Multi-Press Timeouts
-  - platform: state
-    entity_id: "{{ helper_on_button_presses }}"
-    for:
-      milliseconds: "{{ helper_press_delay }}"
-    id: on_multi_press
-  - platform: state
-    entity_id: "{{ helper_up_button_presses }}"
-    for:
-      milliseconds: "{{ helper_press_delay }}"
-    id: up_multi_press
-  - platform: state
-    entity_id: "{{ helper_down_button_presses }}"
-    for:
-      milliseconds: "{{ helper_press_delay }}"
-    id: down_multi_press
-  - platform: state
-    entity_id: "{{ helper_off_button_presses }}"
-    for:
-      milliseconds: "{{ helper_press_delay }}"
-    id: off_multi_press
 actions:
+  - variables:
+      on_single_press_action: !input on_single_press_action
+      on_hold_action: !input on_hold_action
+      on_double_press_action: !input on_double_press_action
+      on_triple_press_action: !input on_triple_press_action
+      on_quadruple_press_action: !input on_quadruple_press_action
+      on_quintuple_press_action: !input on_quintuple_press_action
+      up_single_press_action: !input up_single_press_action
+      up_hold_action: !input up_hold_action
+      up_double_press_action: !input up_double_press_action
+      up_triple_press_action: !input up_triple_press_action
+      up_quadruple_press_action: !input up_quadruple_press_action
+      up_quintuple_press_action: !input up_quintuple_press_action
+      down_single_press_action: !input down_single_press_action
+      down_hold_action: !input down_hold_action
+      down_double_press_action: !input down_double_press_action
+      down_triple_press_action: !input down_triple_press_action
+      down_quadruple_press_action: !input down_quadruple_press_action
+      down_quintuple_press_action: !input down_quintuple_press_action
+      off_single_press_action: !input off_single_press_action
+      off_hold_action: !input off_hold_action
+      off_double_press_action: !input off_double_press_action
+      off_triple_press_action: !input off_triple_press_action
+      off_quadruple_press_action: !input off_quadruple_press_action
+      off_quintuple_press_action: !input off_quintuple_press_action
+
   # ON Button Click
   - choose:
       - conditions:
@@ -374,17 +378,148 @@ actions:
                   - service: counter.increment
                     target:
                       entity_id: "{{ helper_on_button_presses }}"
-              - conditions:
-                  - "{{ helper_on_button_presses == '' }}"
-                sequence:
-                  - wait_template: >
-                      {{ is_state(trigger.entity_id, 'idle') }}
-                  - service: automation.trigger
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_on_button_presses) | int }}"
+                  - service: counter.reset
                     target:
-                      entity_id: "{{ automation.entity_id }}"
-                    data:
-                      skip_condition: true
-                    variables:
-                      action_type: single_press
-                      button: on
+                      entity_id: "{{ helper_on_button_presses }}"
+                  - choose:
+                      - conditions:
+                          - "{{ press_count == 1 }}"
+                        sequence: !input on_single_press_action
+                      - conditions:
+                          - "{{ press_count == 2 }}"
+                        sequence: !input on_double_press_action
+                      - conditions:
+                          - "{{ press_count == 3 }}"
+                        sequence: !input on_triple_press_action
+                      - conditions:
+                          - "{{ press_count == 4 }}"
+                        sequence: !input on_quadruple_press_action
+                      - conditions:
+                          - "{{ press_count >= 5 }}"
+                        sequence: !input on_quintuple_press_action
+            default: !input on_single_press_action
+      - conditions:
+          - "{{ trigger.id == 'on_hold' }}"
+        sequence: !input on_hold_action
+      
+      # UP Button Click
+      - conditions:
+          - "{{ trigger.id == 'up_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_up_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_up_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_up_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_up_button_presses }}"
+                  - choose:
+                      - conditions:
+                          - "{{ press_count == 1 }}"
+                        sequence: !input up_single_press_action
+                      - conditions:
+                          - "{{ press_count == 2 }}"
+                        sequence: !input up_double_press_action
+                      - conditions:
+                          - "{{ press_count == 3 }}"
+                        sequence: !input up_triple_press_action
+                      - conditions:
+                          - "{{ press_count == 4 }}"
+                        sequence: !input up_quadruple_press_action
+                      - conditions:
+                          - "{{ press_count >= 5 }}"
+                        sequence: !input up_quintuple_press_action
+            default: !input up_single_press_action
+      - conditions:
+          - "{{ trigger.id == 'up_hold' }}"
+        sequence: !input up_hold_action
+      
+      # DOWN Button Click
+      - conditions:
+          - "{{ trigger.id == 'down_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_down_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_down_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_down_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_down_button_presses }}"
+                  - choose:
+                      - conditions:
+                          - "{{ press_count == 1 }}"
+                        sequence: !input down_single_press_action
+                      - conditions:
+                          - "{{ press_count == 2 }}"
+                        sequence: !input down_double_press_action
+                      - conditions:
+                          - "{{ press_count == 3 }}"
+                        sequence: !input down_triple_press_action
+                      - conditions:
+                          - "{{ press_count == 4 }}"
+                        sequence: !input down_quadruple_press_action
+                      - conditions:
+                          - "{{ press_count >= 5 }}"
+                        sequence: !input down_quintuple_press_action
+            default: !input down_single_press_action
+      - conditions:
+          - "{{ trigger.id == 'down_hold' }}"
+        sequence: !input down_hold_action
+      
+      # OFF Button Click
+      - conditions:
+          - "{{ trigger.id == 'off_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_off_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_off_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_off_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_off_button_presses }}"
+                  - choose:
+                      - conditions:
+                          - "{{ press_count == 1 }}"
+                        sequence: !input off_single_press_action
+                      - conditions:
+                          - "{{ press_count == 2 }}"
+                        sequence: !input off_double_press_action
+                      - conditions:
+                          - "{{ press_count == 3 }}"
+                        sequence: !input off_triple_press_action
+                      - conditions:
+                          - "{{ press_count == 4 }}"
+                        sequence: !input off_quadruple_press_action
+                      - conditions:
+                          - "{{ press_count >= 5 }}"
+                        sequence: !input off_quintuple_press_action
+            default: !input off_single_press_action
+      - conditions:
+          - "{{ trigger.id == 'off_hold' }}"
+        sequence: !input off_hold_action
     default: []
