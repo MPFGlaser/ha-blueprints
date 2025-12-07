@@ -340,34 +340,8 @@ triggers:
     subtype: off_hold
     id: off_hold
 actions:
-  - variables:
-      on_single_press_action: !input on_single_press_action
-      on_hold_action: !input on_hold_action
-      on_double_press_action: !input on_double_press_action
-      on_triple_press_action: !input on_triple_press_action
-      on_quadruple_press_action: !input on_quadruple_press_action
-      on_quintuple_press_action: !input on_quintuple_press_action
-      up_single_press_action: !input up_single_press_action
-      up_hold_action: !input up_hold_action
-      up_double_press_action: !input up_double_press_action
-      up_triple_press_action: !input up_triple_press_action
-      up_quadruple_press_action: !input up_quadruple_press_action
-      up_quintuple_press_action: !input up_quintuple_press_action
-      down_single_press_action: !input down_single_press_action
-      down_hold_action: !input down_hold_action
-      down_double_press_action: !input down_double_press_action
-      down_triple_press_action: !input down_triple_press_action
-      down_quadruple_press_action: !input down_quadruple_press_action
-      down_quintuple_press_action: !input down_quintuple_press_action
-      off_single_press_action: !input off_single_press_action
-      off_hold_action: !input off_hold_action
-      off_double_press_action: !input off_double_press_action
-      off_triple_press_action: !input off_triple_press_action
-      off_quadruple_press_action: !input off_quadruple_press_action
-      off_quintuple_press_action: !input off_quintuple_press_action
-
-  # ON Button Click
   - choose:
+      # ON Button
       - conditions:
           - "{{ trigger.id == 'on_click' }}"
         sequence:
@@ -386,27 +360,21 @@ actions:
                     target:
                       entity_id: "{{ helper_on_button_presses }}"
                   - choose:
-                      - conditions:
-                          - "{{ press_count == 1 }}"
+                      - conditions: ["{{ press_count == 1 }}"]
                         sequence: !input on_single_press_action
-                      - conditions:
-                          - "{{ press_count == 2 }}"
+                      - conditions: ["{{ press_count == 2 }}"]
                         sequence: !input on_double_press_action
-                      - conditions:
-                          - "{{ press_count == 3 }}"
+                      - conditions: ["{{ press_count == 3 }}"]
                         sequence: !input on_triple_press_action
-                      - conditions:
-                          - "{{ press_count == 4 }}"
+                      - conditions: ["{{ press_count == 4 }}"]
                         sequence: !input on_quadruple_press_action
-                      - conditions:
-                          - "{{ press_count >= 5 }}"
+                      - conditions: ["{{ press_count >= 5 }}"]
                         sequence: !input on_quintuple_press_action
             default: !input on_single_press_action
-      - conditions:
-          - "{{ trigger.id == 'on_hold' }}"
+      - conditions: ["{{ trigger.id == 'on_hold' }}"]
         sequence: !input on_hold_action
-      
-      # UP Button Click
+
+      # UP Button
       - conditions:
           - "{{ trigger.id == 'up_click' }}"
         sequence:
@@ -425,27 +393,21 @@ actions:
                     target:
                       entity_id: "{{ helper_up_button_presses }}"
                   - choose:
-                      - conditions:
-                          - "{{ press_count == 1 }}"
+                      - conditions: ["{{ press_count == 1 }}"]
                         sequence: !input up_single_press_action
-                      - conditions:
-                          - "{{ press_count == 2 }}"
+                      - conditions: ["{{ press_count == 2 }}"]
                         sequence: !input up_double_press_action
-                      - conditions:
-                          - "{{ press_count == 3 }}"
+                      - conditions: ["{{ press_count == 3 }}"]
                         sequence: !input up_triple_press_action
-                      - conditions:
-                          - "{{ press_count == 4 }}"
+                      - conditions: ["{{ press_count == 4 }}"]
                         sequence: !input up_quadruple_press_action
-                      - conditions:
-                          - "{{ press_count >= 5 }}"
+                      - conditions: ["{{ press_count >= 5 }}"]
                         sequence: !input up_quintuple_press_action
             default: !input up_single_press_action
-      - conditions:
-          - "{{ trigger.id == 'up_hold' }}"
+      - conditions: ["{{ trigger.id == 'up_hold' }}"]
         sequence: !input up_hold_action
-      
-      # DOWN Button Click
+
+      # DOWN Button
       - conditions:
           - "{{ trigger.id == 'down_click' }}"
         sequence:
@@ -464,27 +426,21 @@ actions:
                     target:
                       entity_id: "{{ helper_down_button_presses }}"
                   - choose:
-                      - conditions:
-                          - "{{ press_count == 1 }}"
+                      - conditions: ["{{ press_count == 1 }}"]
                         sequence: !input down_single_press_action
-                      - conditions:
-                          - "{{ press_count == 2 }}"
+                      - conditions: ["{{ press_count == 2 }}"]
                         sequence: !input down_double_press_action
-                      - conditions:
-                          - "{{ press_count == 3 }}"
+                      - conditions: ["{{ press_count == 3 }}"]
                         sequence: !input down_triple_press_action
-                      - conditions:
-                          - "{{ press_count == 4 }}"
+                      - conditions: ["{{ press_count == 4 }}"]
                         sequence: !input down_quadruple_press_action
-                      - conditions:
-                          - "{{ press_count >= 5 }}"
+                      - conditions: ["{{ press_count >= 5 }}"]
                         sequence: !input down_quintuple_press_action
             default: !input down_single_press_action
-      - conditions:
-          - "{{ trigger.id == 'down_hold' }}"
+      - conditions: ["{{ trigger.id == 'down_hold' }}"]
         sequence: !input down_hold_action
-      
-      # OFF Button Click
+
+      # OFF Button
       - conditions:
           - "{{ trigger.id == 'off_click' }}"
         sequence:
@@ -503,23 +459,17 @@ actions:
                     target:
                       entity_id: "{{ helper_off_button_presses }}"
                   - choose:
-                      - conditions:
-                          - "{{ press_count == 1 }}"
+                      - conditions: ["{{ press_count == 1 }}"]
                         sequence: !input off_single_press_action
-                      - conditions:
-                          - "{{ press_count == 2 }}"
+                      - conditions: ["{{ press_count == 2 }}"]
                         sequence: !input off_double_press_action
-                      - conditions:
-                          - "{{ press_count == 3 }}"
+                      - conditions: ["{{ press_count == 3 }}"]
                         sequence: !input off_triple_press_action
-                      - conditions:
-                          - "{{ press_count == 4 }}"
+                      - conditions: ["{{ press_count == 4 }}"]
                         sequence: !input off_quadruple_press_action
-                      - conditions:
-                          - "{{ press_count >= 5 }}"
+                      - conditions: ["{{ press_count >= 5 }}"]
                         sequence: !input off_quintuple_press_action
             default: !input off_single_press_action
-      - conditions:
-          - "{{ trigger.id == 'off_hold' }}"
+      - conditions: ["{{ trigger.id == 'off_hold' }}"]
         sequence: !input off_hold_action
     default: []
