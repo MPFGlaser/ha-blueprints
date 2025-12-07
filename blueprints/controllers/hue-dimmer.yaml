@@ -1,0 +1,475 @@
+blueprint:
+  domain: automation
+  name: z2m - Philips Hue Dimmer Switch - Multi-Press and Hold
+  author: MPFGlaser
+  homeassistant:
+    min_version: 2024.6.0
+  description: >
+    ## [z2m] Philips Hue Dimmer Switch - Multi-Press and Hold Automation (v0.0.1) by MPFGlaser
+    
+    Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.  
+    Might support 324131092621 as well, but this is not tested.  
+
+    Aims to provide the same functionality as the Philips Hue Dimmer Switch provides when used with the Philips Hue Bridge.  
+
+
+    *Only for use with Zigbee2MQTT*
+
+    ### Features
+
+    - Supports single presses, holds, and multi-presses (2-5 clicks) for all buttons.  
+    
+    - Multi-press support is optional, not assigning a helper will disable multi-presses for that button. 
+    
+    - Uses Input Counters as helpers to track multi-press counts.  
+     
+    - Native Hue-like behaviour: Waits for a short delay after the last press to determine if more presses are coming before executing the action.
+  input:
+    dimmer_switch:
+      name: Philips Hue Dimmer Switch
+      description: Choose the Philips Hue Dimmer Switch device to configure
+      selector:
+        device:
+          filter:
+            - integration: mqtt
+              manufacturer: Philips
+              model: Hue dimmer switch
+          multiple: false
+    multi_press_helpers:
+      name: (Optional) Enable Multi-Press Support
+      description: >
+        Assign an Input Counter helper entity for each button you want to enable multi-press support for.
+
+        If left empty, only single presses and holds will be supported for that button.  
+
+        You need to manually create Input Counter helper entities for this, with minimum 0, maximum 5, initial value 0, and step size 1.
+
+
+        Please note that each helper needs to be unique to each dimmer switch that you automate using this blueprint,
+        reuse of helpers across different dimmer switches may lead to unintended behaviour.
+      icon: mdi:counter
+      collapsed: true
+      input:
+        helper_press_delay:
+          name: Helper - Press Delay
+          description: >
+            Maximum delay in milliseconds between button presses to count as multi-press.  
+
+            If the delay between two presses exceeds this value, the multi-press count will reset.
+          default: 350
+          selector:
+            number:
+              min: 50
+              max: 1500
+              step: 50
+              mode: slider
+        helper_on_button_presses:
+          name: Helper - "On" Button Multi-Presses
+          default: ""
+          selector:
+            entity:
+              domain:
+                - counter
+              multiple: false
+              reorder: false
+        helper_up_button_presses:
+          name: Helper - "Up" Button Multi-Presses
+          default: ""
+          selector:
+            entity:
+              domain:
+                - counter
+              multiple: false
+              reorder: false       
+        helper_down_button_presses:
+          name: Helper - "Down" Button Multi-Presses
+          default: ""
+          selector:
+            entity:
+              domain:
+                - counter
+              multiple: false
+              reorder: false   
+        helper_off_button_presses:
+          name: Helper - "Off"/"Hue" Button Multi-Presses
+          default: ""
+          selector:
+            entity:
+              domain:
+                - counter
+              multiple: false
+              reorder: false   
+    on_button_actions:
+      name: On Button Actions
+      description: >
+        Define actions for the "On" button presses and holds.  
+
+        Multi-press actions will only be available if a multi-press helper is assigned above.
+      icon: mdi:power-on
+      collapsed: true
+      input:
+        on_single_press_action:
+          name: Single Press Action
+          description: Action to perform on single press of "On" button.
+          default: []
+          selector:
+            action: {}
+        on_hold_action:
+          name: Hold Action
+          description: Action to perform on hold of "On" button.
+          default: []
+          selector:
+            action: {}
+        on_double_press_action:
+          name: Double (2x) Press Action
+          description: Action to perform on double press of "On" button.
+          default: []
+          selector:
+            action: {}
+        on_triple_press_action:
+          name: Triple (3x) Press Action
+          description: Action to perform on triple press of "On" button.
+          default: []
+          selector:
+            action: {}
+        on_quadruple_press_action:
+          name: Quadruple (4x) Press Action
+          description: Action to perform on quadruple press of "On" button.
+          default: []
+          selector:
+            action: {}
+        on_quintuple_press_action:
+          name: Quintuple (5x) Press Action
+          description: Action to perform on quintuple press of "On" button.
+          default: []
+          selector:
+            action: {}  
+    up_button_actions:
+      name: Up Button Actions
+      description: >
+        Define actions for the "Up" button presses and holds.
+
+        Multi-press actions will only be available if a multi-press helper is assigned above.
+      icon: mdi:brightness-7
+      collapsed: true
+      input:
+        up_single_press_action:
+          name: Single Press Action
+          description: Action to perform on single press of "Up" button.
+          default: []
+          selector:
+            action: {}
+        up_hold_action:
+          name: Hold Action
+          description: Action to perform on hold of "Up" button.
+          default: []
+          selector:
+            action: {}
+        up_double_press_action:
+          name: Double (2x) Press Action
+          description: Action to perform on double press of "Up" button.
+          default: []
+          selector:
+            action: {}
+        up_triple_press_action:
+          name: Triple (3x) Press Action
+          description: Action to perform on triple press of "Up" button.
+          default: []
+          selector:
+            action: {}
+        up_quadruple_press_action:
+          name: Quadruple (4x) Press Action
+          description: Action to perform on quadruple press of "Up" button.
+          default: []
+          selector:
+            action: {}
+        up_quintuple_press_action:
+          name: Quintuple (5x) Press Action
+          description: Action to perform on quintuple press of "Up" button.
+          default: []
+          selector:
+            action: {}  
+    down_button_actions:
+      name: Down Button Actions
+      description: > 
+        Define actions for the "Down" button presses and holds.
+
+        Multi-press actions will only be available if a multi-press helper is assigned above.
+      icon: mdi:brightness-5
+      collapsed: true
+      input:
+        down_single_press_action:
+          name: Single Press Action
+          description: Action to perform on single press of "Down" button.
+          default: []
+          selector:
+            action: {}
+        down_hold_action:
+          name: Hold Action
+          description: Action to perform on hold of "Down" button.
+          default: []
+          selector:
+            action: {}
+        down_double_press_action:
+          name: Double (2x) Press Action
+          description: Action to perform on double press of "Down" button.
+          default: []
+          selector:
+            action: {}
+        down_triple_press_action:
+          name: Triple (3x) Press Action
+          description: Action to perform on triple press of "Down" button.
+          default: []
+          selector:
+            action: {}
+        down_quadruple_press_action:
+          name: Quadruple (4x) Press Action
+          description: Action to perform on quadruple press of "Down" button.
+          default: []
+          selector:
+            action: {}
+        down_quintuple_press_action:
+          name: Quintuple (5x) Press Action
+          description: Action to perform on quintuple press of "Down" button.
+          default: []
+          selector:
+            action: {}  
+    off_button_actions:
+      name: Off/Hue Button Actions
+      description: > 
+        Define actions for the "Off"/"Hue" button presses and holds.
+
+        Multi-press actions will only be available if a multi-press helper is assigned above.
+      icon: mdi:power-off
+      collapsed: true
+      input:
+        off_single_press_action:
+          name: Single Press Action
+          description: Action to perform on single press of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}
+        off_hold_action:
+          name: Hold Action
+          description: Action to perform on hold of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}
+        off_double_press_action:
+          name: Double (2x) Press Action
+          description: Action to perform on double press of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}
+        off_triple_press_action:
+          name: Triple (3x) Press Action
+          description: Action to perform on triple press of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}
+        off_quadruple_press_action:
+          name: Quadruple (4x) Press Action
+          description: Action to perform on quadruple press of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}
+        off_quintuple_press_action:
+          name: Quintuple (5x) Press Action
+          description: Action to perform on quintuple press of "Off"/"Hue" button.
+          default: []
+          selector:
+            action: {}  
+mode: restart
+max_exceeded: silent
+variables:
+  helper_on_button_presses: !input helper_on_button_presses
+  helper_up_button_presses: !input helper_up_button_presses
+  helper_down_button_presses: !input helper_down_button_presses
+  helper_off_button_presses: !input helper_off_button_presses
+  helper_press_delay: !input helper_press_delay
+triggers:
+  # Button Presses
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: on_press_release
+    id: on_click
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: up_press_release
+    id: up_click
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: down_press_release
+    id: down_click
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: off_press_release
+    id: off_click
+
+  # Button Holds
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: on_hold
+    id: on_hold
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: up_hold
+    id: up_hold
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: down_hold
+    id: down_hold
+  - platform: device
+    device_id: !input dimmer_switch
+    domain: mqtt
+    type: action
+    subtype: off_hold
+    id: off_hold
+actions:
+  - choose:
+      # ON Button
+      - conditions:
+          - "{{ trigger.id == 'on_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_on_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_on_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_on_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_on_button_presses }}"
+                  - choose:
+                      - conditions: ["{{ press_count == 1 }}"]
+                        sequence: !input on_single_press_action
+                      - conditions: ["{{ press_count == 2 }}"]
+                        sequence: !input on_double_press_action
+                      - conditions: ["{{ press_count == 3 }}"]
+                        sequence: !input on_triple_press_action
+                      - conditions: ["{{ press_count == 4 }}"]
+                        sequence: !input on_quadruple_press_action
+                      - conditions: ["{{ press_count >= 5 }}"]
+                        sequence: !input on_quintuple_press_action
+            default: !input on_single_press_action
+      - conditions: ["{{ trigger.id == 'on_hold' }}"]
+        sequence: !input on_hold_action
+
+      # UP Button
+      - conditions:
+          - "{{ trigger.id == 'up_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_up_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_up_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_up_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_up_button_presses }}"
+                  - choose:
+                      - conditions: ["{{ press_count == 1 }}"]
+                        sequence: !input up_single_press_action
+                      - conditions: ["{{ press_count == 2 }}"]
+                        sequence: !input up_double_press_action
+                      - conditions: ["{{ press_count == 3 }}"]
+                        sequence: !input up_triple_press_action
+                      - conditions: ["{{ press_count == 4 }}"]
+                        sequence: !input up_quadruple_press_action
+                      - conditions: ["{{ press_count >= 5 }}"]
+                        sequence: !input up_quintuple_press_action
+            default: !input up_single_press_action
+      - conditions: ["{{ trigger.id == 'up_hold' }}"]
+        sequence: !input up_hold_action
+
+      # DOWN Button
+      - conditions:
+          - "{{ trigger.id == 'down_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_down_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_down_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_down_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_down_button_presses }}"
+                  - choose:
+                      - conditions: ["{{ press_count == 1 }}"]
+                        sequence: !input down_single_press_action
+                      - conditions: ["{{ press_count == 2 }}"]
+                        sequence: !input down_double_press_action
+                      - conditions: ["{{ press_count == 3 }}"]
+                        sequence: !input down_triple_press_action
+                      - conditions: ["{{ press_count == 4 }}"]
+                        sequence: !input down_quadruple_press_action
+                      - conditions: ["{{ press_count >= 5 }}"]
+                        sequence: !input down_quintuple_press_action
+            default: !input down_single_press_action
+      - conditions: ["{{ trigger.id == 'down_hold' }}"]
+        sequence: !input down_hold_action
+
+      # OFF Button
+      - conditions:
+          - "{{ trigger.id == 'off_click' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - "{{ helper_off_button_presses != '' }}"
+                sequence:
+                  - service: counter.increment
+                    target:
+                      entity_id: "{{ helper_off_button_presses }}"
+                  - delay:
+                      milliseconds: "{{ helper_press_delay }}"
+                  - variables:
+                      press_count: "{{ states(helper_off_button_presses) | int }}"
+                  - service: counter.reset
+                    target:
+                      entity_id: "{{ helper_off_button_presses }}"
+                  - choose:
+                      - conditions: ["{{ press_count == 1 }}"]
+                        sequence: !input off_single_press_action
+                      - conditions: ["{{ press_count == 2 }}"]
+                        sequence: !input off_double_press_action
+                      - conditions: ["{{ press_count == 3 }}"]
+                        sequence: !input off_triple_press_action
+                      - conditions: ["{{ press_count == 4 }}"]
+                        sequence: !input off_quadruple_press_action
+                      - conditions: ["{{ press_count >= 5 }}"]
+                        sequence: !input off_quintuple_press_action
+            default: !input off_single_press_action
+      - conditions: ["{{ trigger.id == 'off_hold' }}"]
+        sequence: !input off_hold_action
+    default: []
