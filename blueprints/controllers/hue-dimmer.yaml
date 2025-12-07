@@ -56,7 +56,7 @@ blueprint:
             Maximum delay in milliseconds between button presses to count as multi-press.  
 
             If the delay between two presses exceeds this value, the multi-press count will reset.
-          default: 250
+          default: 350
           selector:
             number:
               min: 50
