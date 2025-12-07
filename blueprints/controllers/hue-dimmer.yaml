@@ -1,17 +1,33 @@
 blueprint:
   domain: automation
   name: z2m - Philips Hue Dimmer Switch - Multi-Press and Hold
-  author: Max Glaser
-  description: 
-    "Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.\n
-    Might support 324131092621 as well, but this is not tested.
+  author: MPFGlaser
+  homeassistant:
+    min_version: 2024.6.0
+  description: >
+    ## [z2m] Philips Hue Dimmer Switch - Multi-Press and Hold Automation (v0.0.1) by MPFGlaser
+    
+    Automation for Philips Hue Dimmer Switch (929002398602) to handle multi-press and hold actions.  
+    Might support 324131092621 as well, but this is not tested.  
 
-    Please note that each helper needs to be unique to each dimmer switch that you automate using this blueprint,
-    otherwise you might run into unintended behaviour."
+    Aims to provide the same functionality as the Philips Hue Dimmer Switch provides when used with the Philips Hue Bridge.  
+
+
+    *Only for use with Zigbee2MQTT*
+
+    ### Features
+
+    - Supports single presses, holds, and multi-presses (2-5 clicks) for all buttons.  
+    
+    - Multi-press support is optional, not assigning a helper will disable multi-presses for that button. 
+    
+    - Uses Input Counters as helpers to track multi-press counts.  
+     
+    - Native Hue-like behaviour: Waits for a short delay after the last press to determine if more presses are coming before executing the action.
   input:
     dimmer_switch:
       name: Philips Hue Dimmer Switch
-      description: List of available Philips Hue Dimmer Switches
+      description: Choose the Philips Hue Dimmer Switch device to configure
       selector:
         device:
           filter:
