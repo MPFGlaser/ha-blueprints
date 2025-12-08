@@ -70,15 +70,6 @@ data:
 
 These scripts can be called from anywhere in Home Assistant:
 
-### Example Configuration
-
-When setting up your Hue Dimmer automation using the blueprint, configure the button actions as follows:
-
-#### On Button - Single Press (Toggle Lights)
-## Use Cases
-
-These scripts can be called from anywhere in Home Assistant:
-
 ### From Automations
 
 Use with any automation trigger:
@@ -253,8 +244,6 @@ data:
 3. Turns off only those lights, leaving already-off lights unchanged
 
 This prevents the annoying behavior where pressing a dimmer's "off" button turns on lights that were previously off!
-
-## Troubleshooting
 
 ## Troubleshooting
 
