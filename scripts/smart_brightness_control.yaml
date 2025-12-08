@@ -1,0 +1,186 @@
+blueprint:
+  domain: script
+  name: Smart Brightness Control
+  author: MPFGlaser
+  description: >
+    ## Smart Brightness Control (v1.0.0) by MPFGlaser
+    
+    Adjusts brightness only for lights that are currently ON.
+    
+    This script prevents lights from turning off completely by setting a minimum brightness of 1%.
+    It supports targeting individual lights, groups, areas, and floors, and can be called from any automation, script, or button.
+    
+    ### Features
+    
+    - Only affects lights that are already on (no unwanted turn-ons)
+    - Minimum brightness of 1% (prevents complete off)
+    - Optional transition time for smooth brightness changes
+    - Supports areas, floors, devices, and entity targets
+    - Parallel execution mode for responsive control
+  homeassistant:
+    min_version: 2024.6.0
+  source_url: https://github.com/MPFGlaser/ha-blueprints/blob/main/scripts/smart_brightness_control.yaml
+  input:
+    target:
+      name: Target
+      description: Target lights (area, floor, device, or entity)
+      selector:
+        target:
+          entity:
+            - domain: light
+    action:
+      name: Action
+      description: Direction to adjust brightness (up or down)
+      selector:
+        select:
+          options:
+            - up
+            - down
+    step:
+      name: Brightness Step
+      description: Brightness adjustment step in percentage
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+          unit_of_measurement: "%"
+    transition:
+      name: Transition Time
+      description: Duration of the brightness change in seconds (optional)
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 60
+          step: 0.5
+          unit_of_measurement: "s"
+
+alias: Smart Brightness Control
+icon: mdi:brightness-6
+mode: parallel
+max: 10
+fields:
+  target:
+    description: Target for the lights (area, floor, device, or entity)
+    required: true
+    selector:
+      target:
+        entity:
+          - domain: light
+  action:
+    description: Direction to adjust brightness (up or down)
+    required: true
+    selector:
+      select:
+        options:
+          - up
+          - down
+  step:
+    description: Brightness adjustment step in percentage
+    required: false
+    default: 10
+    selector:
+      number:
+        min: 1
+        max: 100
+        step: 1
+        unit_of_measurement: "%"
+  transition:
+    description: Duration of the brightness change in seconds (optional)
+    required: false
+    default: 0
+    selector:
+      number:
+        min: 0
+        max: 60
+        step: 0.5
+        unit_of_measurement: "s"
+  sequence:
+    - variables:
+        # Get all light entities from the target
+        target_entities: >-
+          {% set ns = namespace(entities=[]) %}
+          
+          {# Handle area_id #}
+          {% if target.area_id is defined %}
+            {% if target.area_id is string %}
+              {% set areas = [target.area_id] %}
+            {% else %}
+              {% set areas = target.area_id %}
+            {% endif %}
+            {% for area in areas %}
+              {% set ns.entities = ns.entities + area_entities(area) | select('match', '^light\.') | list %}
+            {% endfor %}
+          {% endif %}
+          
+          {# Handle floor_id #}
+          {% if target.floor_id is defined %}
+            {% if target.floor_id is string %}
+              {% set floors = [target.floor_id] %}
+            {% else %}
+              {% set floors = target.floor_id %}
+            {% endif %}
+            {% for floor in floors %}
+              {% set ns.entities = ns.entities + floor_entities(floor) | select('match', '^light\.') | list %}
+            {% endfor %}
+          {% endif %}
+          
+          {# Handle device_id #}
+          {% if target.device_id is defined %}
+            {% if target.device_id is string %}
+              {% set devices = [target.device_id] %}
+            {% else %}
+              {% set devices = target.device_id %}
+            {% endif %}
+            {% for device in devices %}
+              {% set ns.entities = ns.entities + device_entities(device) | select('match', '^light\.') | list %}
+            {% endfor %}
+          {% endif %}
+          
+          {# Handle entity_id #}
+          {% if target.entity_id is defined %}
+            {% if target.entity_id is string %}
+              {% set ns.entities = ns.entities + [target.entity_id] %}
+            {% else %}
+              {% set ns.entities = ns.entities + target.entity_id %}
+            {% endif %}
+          {% endif %}
+          
+          {{ ns.entities | unique | list }}
+        
+        # Filter to only lights that are currently ON
+        lights_on: >-
+          {{ target_entities | select('is_state', 'on') | list }}
+        
+        # Calculate new brightness based on action
+        brightness_adjustment: >-
+          {{ step if action == 'up' else -step }}
+    
+    # Only proceed if there are lights that are on
+    - condition: template
+      value_template: "{{ lights_on | length > 0 }}"
+    
+    # Adjust brightness for each light that is on
+    - repeat:
+        for_each: "{{ lights_on }}"
+        sequence:
+          - variables:
+              current_brightness_pct: >-
+                {% set brightness = state_attr(repeat.item, 'brightness') %}
+                {% if brightness is not none %}
+                  {{ (brightness | int / 255 * 100) | round(1) }}
+                {% else %}
+                  {{ 100 }}
+                {% endif %}
+              new_brightness_pct: >-
+                {{ [1, [100, current_brightness_pct + brightness_adjustment] | min] | max }}
+              new_brightness_value: >-
+                {{ (new_brightness_pct * 255 / 100) | int }}
+          - service: light.turn_on
+            target:
+              entity_id: "{{ repeat.item }}"
+            data:
+              brightness: "{{ new_brightness_value }}"
+              transition: "{{ transition }}"

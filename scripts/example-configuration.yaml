@@ -1,0 +1,258 @@
+# Example Configuration: Hue Dimmer with Smart Light Control
+#
+# This example shows how to configure the Hue Dimmer Switch blueprint
+# to use the smart light control scripts for intelligent brightness
+# and toggle behavior.
+#
+# Copy this configuration and adjust the values to match your setup.
+
+# Step 1: Create Input Counter helpers (if using multi-press)
+# Go to Settings > Devices & Services > Helpers
+# Create counters with: min=0, max=5, initial=0, step=1
+# Example names:
+#   - counter.living_room_dimmer_on
+#   - counter.living_room_dimmer_up
+#   - counter.living_room_dimmer_down
+#   - counter.living_room_dimmer_off
+
+# Step 2: Import the Hue Dimmer blueprint
+# Use the blueprint import URL or copy the YAML file
+
+# Step 3: Create the automation using this configuration
+
+automation:
+  - id: living_room_hue_dimmer
+    alias: Living Room - Hue Dimmer Control
+    use_blueprint:
+      path: MPFGlaser/hue-dimmer.yaml
+      input:
+        # Select your dimmer switch device
+        dimmer_switch: YOUR_DIMMER_DEVICE_ID_HERE
+        
+        # Optional: Multi-press helpers
+        multi_press_helpers:
+          helper_press_delay: 350
+          helper_on_button_presses: counter.living_room_dimmer_on
+          helper_up_button_presses: counter.living_room_dimmer_up
+          helper_down_button_presses: counter.living_room_dimmer_down
+          helper_off_button_presses: counter.living_room_dimmer_off
+        
+        # On button actions
+        on_button_actions:
+          # Single press: Toggle only lights that were on
+          on_single_press_action:
+            - service: script.smart_light_toggle
+              data:
+                target:
+                  area_id: living_room
+          
+          # Hold: Turn on all lights to 100%
+          on_hold_action:
+            - service: light.turn_on
+              target:
+                area_id: living_room
+              data:
+                brightness_pct: 100
+          
+          # Double press: Turn on all lights to 50%
+          on_double_press_action:
+            - service: light.turn_on
+              target:
+                area_id: living_room
+              data:
+                brightness_pct: 50
+        
+        # Up button actions
+        up_button_actions:
+          # Single press: Increase brightness by 10%
+          up_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id: living_room
+                action: up
+                step: 10
+          
+          # Hold: Increase brightness by 30%
+          up_hold_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id: living_room
+                action: up
+                step: 30
+          
+          # Double press: Set to 75%
+          up_double_press_action:
+            - service: light.turn_on
+              target:
+                area_id: living_room
+              data:
+                brightness_pct: 75
+        
+        # Down button actions
+        down_button_actions:
+          # Single press: Decrease brightness by 10%
+          down_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id: living_room
+                action: down
+                step: 10
+          
+          # Hold: Decrease brightness by 30%
+          down_hold_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id: living_room
+                action: down
+                step: 30
+          
+          # Double press: Set to 25%
+          down_double_press_action:
+            - service: light.turn_on
+              target:
+                area_id: living_room
+              data:
+                brightness_pct: 25
+        
+        # Off button actions
+        off_button_actions:
+          # Single press: Turn off all lights
+          off_single_press_action:
+            - service: light.turn_off
+              target:
+                area_id: living_room
+          
+          # Hold: Turn off all lights on the floor
+          off_hold_action:
+            - service: light.turn_off
+              target:
+                floor_id: ground_floor
+          
+          # Double press: Turn on accent/mood lighting
+          off_double_press_action:
+            - service: light.turn_on
+              target:
+                entity_id:
+                  - light.floor_lamp
+                  - light.accent_light
+              data:
+                brightness_pct: 20
+                color_temp: 454  # Warm white
+
+---
+# Alternative: Multi-area control
+# Control multiple areas with one dimmer
+
+automation:
+  - id: multi_area_hue_dimmer
+    alias: Multi-Area - Hue Dimmer Control
+    use_blueprint:
+      path: MPFGlaser/hue-dimmer.yaml
+      input:
+        dimmer_switch: YOUR_DIMMER_DEVICE_ID_HERE
+        
+        on_button_actions:
+          on_single_press_action:
+            - service: script.smart_light_toggle
+              data:
+                target:
+                  area_id:
+                    - living_room
+                    - kitchen
+                    - hallway
+        
+        up_button_actions:
+          up_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id:
+                    - living_room
+                    - kitchen
+                    - hallway
+                action: up
+                step: 10
+        
+        down_button_actions:
+          down_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  area_id:
+                    - living_room
+                    - kitchen
+                    - hallway
+                action: down
+                step: 10
+        
+        off_button_actions:
+          off_single_press_action:
+            - service: light.turn_off
+              target:
+                area_id:
+                  - living_room
+                  - kitchen
+                  - hallway
+
+---
+# Alternative: Floor-level control
+# Control an entire floor with one dimmer
+
+automation:
+  - id: floor_hue_dimmer
+    alias: Ground Floor - Hue Dimmer Control
+    use_blueprint:
+      path: MPFGlaser/hue-dimmer.yaml
+      input:
+        dimmer_switch: YOUR_DIMMER_DEVICE_ID_HERE
+        
+        on_button_actions:
+          on_single_press_action:
+            - service: script.smart_light_toggle
+              data:
+                target:
+                  floor_id: ground_floor
+        
+        up_button_actions:
+          up_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  floor_id: ground_floor
+                action: up
+                step: 10
+          
+          up_hold_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  floor_id: ground_floor
+                action: up
+                step: 25
+        
+        down_button_actions:
+          down_single_press_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  floor_id: ground_floor
+                action: down
+                step: 10
+          
+          down_hold_action:
+            - service: script.smart_brightness_control
+              data:
+                target:
+                  floor_id: ground_floor
+                action: down
+                step: 25
+        
+        off_button_actions:
+          off_single_press_action:
+            - service: light.turn_off
+              target:
+                floor_id: ground_floor
