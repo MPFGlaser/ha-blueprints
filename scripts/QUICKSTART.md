@@ -2,66 +2,47 @@
 
 ## What Was Created
 
-This solution provides two reusable Home Assistant script templates that solve the brightness control and light toggling issues with the Hue Dimmer Switch:
+Two reusable Home Assistant script blueprints that can be called from anywhere:
 
-1. **Smart Brightness Control** (`smart_brightness_control.yaml`)
+1. **Smart Brightness Control (v1.0.0)**
    - Adjusts brightness ONLY for lights that are already on
    - Never turns off lights (minimum 1% brightness)
+   - Optional transition time for smooth changes
    - Works with areas, floors, and individual lights
 
-2. **Smart Light Toggle** (`smart_light_toggle.yaml`)
+2. **Smart Light Toggle (v1.0.0)**
    - Toggles ONLY lights that were previously on
    - Leaves off lights unchanged
-   - Perfect for dimmer "off" button behavior
+   - Perfect for any automation or button
 
-## Installation (5 Minutes)
+## Installation (2 Minutes)
 
-### Step 1: Copy Script Files to Home Assistant
+### Smart Brightness Control
 
-Copy these files to your Home Assistant configuration directory (where `configuration.yaml` is located):
+1. Click this button to import:
 
-```
-your-config-directory/
-├── configuration.yaml
-└── scripts/
-    ├── smart_brightness_control.yaml
-    └── smart_light_toggle.yaml
-```
+   [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMPFGlaser%2Fha-blueprints%2Fblob%2Fmain%2Fscripts%2Fsmart_brightness_control.yaml)
 
-### Step 2: Update configuration.yaml
+2. Confirm the import in Home Assistant
 
-Add this line to your `configuration.yaml`:
+### Smart Light Toggle
 
-```yaml
-script: !include_dir_merge_named scripts/
-```
+1. Click this button to import:
 
-OR if you already have a `script:` section:
+   [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMPFGlaser%2Fha-blueprints%2Fblob%2Fmain%2Fscripts%2Fsmart_light_toggle.yaml)
 
-```yaml
-script:
-  smart_brightness_control: !include scripts/smart_brightness_control.yaml
-  smart_light_toggle: !include scripts/smart_light_toggle.yaml
-  # ... your other scripts ...
-```
+2. Confirm the import in Home Assistant
 
-### Step 3: Restart Home Assistant
+### Verify Installation
 
-Go to **Developer Tools** > **YAML** > **Restart** (or Settings > System > Restart)
-
-### Step 4: Verify Installation
-
-1. Go to **Developer Tools** > **Services**
-2. Search for "smart_brightness" or "smart_light_toggle"
-3. You should see both new scripts available!
+1. Go to **Settings** > **Automations & Scenes** > **Scripts**
+2. You should see both scripts listed!
 
 ## Basic Usage
 
-Once installed, you can use these scripts in your Hue Dimmer blueprint configuration or any automation.
+These scripts can be called from any automation, script, button, or dashboard.
 
-### In the Hue Dimmer Blueprint
-
-When configuring your Hue Dimmer automation:
+### With Hue Dimmer Blueprint
 
 **On Button** (Toggle lights that are on):
 ```yaml
@@ -79,6 +60,7 @@ data:
     area_id: living_room
   action: up
   step: 10
+  transition: 0.5
 ```
 
 **Down Button** (Decrease brightness):
@@ -89,13 +71,37 @@ data:
     area_id: living_room
   action: down
   step: 10
+  transition: 0.5
 ```
 
-**Off Button** (Turn all lights off):
+### From Automations
+
 ```yaml
-service: light.turn_off
-target:
-  area_id: living_room
+automation:
+  - trigger:
+      - platform: state
+        entity_id: binary_sensor.motion
+        to: 'on'
+    action:
+      - service: script.smart_brightness_control
+        data:
+          target:
+            area_id: hallway
+          action: up
+          step: 20
+          transition: 2
+```
+
+### From Buttons/Dashboards
+
+```yaml
+type: button
+tap_action:
+  action: call-service
+  service: script.smart_light_toggle
+  data:
+    target:
+      area_id: living_room
 ```
 
 ## Quick Examples
@@ -130,6 +136,18 @@ data:
       - light.floor_lamp
   action: down
   step: 20
+  transition: 1
+```
+
+### Smooth Transitions
+```yaml
+service: script.smart_brightness_control
+data:
+  target:
+    area_id: bedroom
+  action: down
+  step: 40
+  transition: 3  # Dim slowly over 3 seconds
 ```
 
 ## Why This Solves Your Problem

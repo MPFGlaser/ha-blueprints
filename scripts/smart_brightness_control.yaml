@@ -1,42 +1,44 @@
-# Smart Brightness Control Script Template
-# 
-# This script adjusts brightness for lights that are currently ON only.
-# It prevents lights from turning off completely by setting a minimum brightness of 1%.
-# Supports targeting individual lights, groups, areas, and floors.
-#
-# Usage:
-#   service: script.smart_brightness_control
-#   data:
-#     target:
-#       area_id: living_room  # or floor_id, device_id, entity_id
-#     action: up  # or 'down'
-#     step: 10  # optional, default 10%
-
-smart_brightness_control:
-  alias: Smart Brightness Control
-  description: Adjusts brightness only for lights that are currently on, with a 1% minimum
-  icon: mdi:brightness-6
-  mode: parallel
-  max: 10
-  fields:
+blueprint:
+  domain: script
+  name: Smart Brightness Control
+  author: MPFGlaser
+  description: >
+    ## Smart Brightness Control (v1.0.0) by MPFGlaser
+    
+    Adjusts brightness only for lights that are currently ON.
+    
+    This script prevents lights from turning off completely by setting a minimum brightness of 1%.
+    It supports targeting individual lights, groups, areas, and floors, and can be called from any automation, script, or button.
+    
+    ### Features
+    
+    - Only affects lights that are already on (no unwanted turn-ons)
+    - Minimum brightness of 1% (prevents complete off)
+    - Optional transition time for smooth brightness changes
+    - Supports areas, floors, devices, and entity targets
+    - Parallel execution mode for responsive control
+  homeassistant:
+    min_version: 2024.6.0
+  source_url: https://github.com/MPFGlaser/ha-blueprints/blob/main/scripts/smart_brightness_control.yaml
+  input:
     target:
-      description: Target for the lights (area, floor, device, or entity)
-      required: true
+      name: Target
+      description: Target lights (area, floor, device, or entity)
       selector:
         target:
           entity:
             - domain: light
     action:
+      name: Action
       description: Direction to adjust brightness (up or down)
-      required: true
       selector:
         select:
           options:
             - up
             - down
     step:
+      name: Brightness Step
       description: Brightness adjustment step in percentage
-      required: false
       default: 10
       selector:
         number:
@@ -44,6 +46,57 @@ smart_brightness_control:
           max: 100
           step: 1
           unit_of_measurement: "%"
+    transition:
+      name: Transition Time
+      description: Duration of the brightness change in seconds (optional)
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 60
+          step: 0.5
+          unit_of_measurement: "s"
+
+alias: Smart Brightness Control
+icon: mdi:brightness-6
+mode: parallel
+max: 10
+fields:
+  target:
+    description: Target for the lights (area, floor, device, or entity)
+    required: true
+    selector:
+      target:
+        entity:
+          - domain: light
+  action:
+    description: Direction to adjust brightness (up or down)
+    required: true
+    selector:
+      select:
+        options:
+          - up
+          - down
+  step:
+    description: Brightness adjustment step in percentage
+    required: false
+    default: 10
+    selector:
+      number:
+        min: 1
+        max: 100
+        step: 1
+        unit_of_measurement: "%"
+  transition:
+    description: Duration of the brightness change in seconds (optional)
+    required: false
+    default: 0
+    selector:
+      number:
+        min: 0
+        max: 60
+        step: 0.5
+        unit_of_measurement: "s"
   sequence:
     - variables:
         # Get all light entities from the target
@@ -130,3 +183,4 @@ smart_brightness_control:
               entity_id: "{{ repeat.item }}"
             data:
               brightness: "{{ new_brightness_value }}"
+              transition: "{{ transition }}"

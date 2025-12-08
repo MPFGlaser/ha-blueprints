@@ -1,29 +1,45 @@
-# Smart Light Toggle Script Template
-# 
-# This script toggles only the lights that were previously ON, leaving OFF lights untouched.
-# Perfect for dimmer switches where you want to turn off only the lights you turned on.
-# Supports targeting individual lights, groups, areas, and floors.
-#
-# Usage:
-#   service: script.smart_light_toggle
-#   data:
-#     target:
-#       area_id: living_room  # or floor_id, device_id, entity_id
-
-smart_light_toggle:
-  alias: Smart Light Toggle
-  description: Toggles only lights that are currently on, leaving off lights unchanged
-  icon: mdi:lightbulb-toggle
-  mode: parallel
-  max: 10
-  fields:
+blueprint:
+  domain: script
+  name: Smart Light Toggle
+  author: MPFGlaser
+  description: >
+    ## Smart Light Toggle (v1.0.0) by MPFGlaser
+    
+    Toggles only the lights that were previously ON, leaving OFF lights untouched.
+    
+    Perfect for dimmer switches where you want to turn off only the lights you turned on.
+    It supports targeting individual lights, groups, areas, and floors, and can be called from any automation, script, or button.
+    
+    ### Features
+    
+    - Only toggles lights that are currently on
+    - Leaves off lights unchanged (no unwanted turn-ons)
+    - Supports areas, floors, devices, and entity targets
+    - Parallel execution mode for responsive control
+  homeassistant:
+    min_version: 2024.6.0
+  source_url: https://github.com/MPFGlaser/ha-blueprints/blob/main/scripts/smart_light_toggle.yaml
+  input:
     target:
-      description: Target for the lights (area, floor, device, or entity)
-      required: true
+      name: Target
+      description: Target lights (area, floor, device, or entity)
       selector:
         target:
           entity:
             - domain: light
+
+alias: Smart Light Toggle
+icon: mdi:lightbulb-toggle
+mode: parallel
+max: 10
+fields:
+  target:
+    description: Target for the lights (area, floor, device, or entity)
+    required: true
+    selector:
+      target:
+        entity:
+          - domain: light
   sequence:
     - variables:
         # Get all light entities from the target
