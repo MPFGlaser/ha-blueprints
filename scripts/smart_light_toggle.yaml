@@ -80,11 +80,6 @@ smart_light_toggle:
         # Filter to only lights that are currently ON
         lights_on: >-
           {{ target_entities | select('is_state', 'on') | list }}
-        
-        # Count lights in different states
-        total_lights: "{{ target_entities | length }}"
-        on_count: "{{ lights_on | length }}"
-        off_count: "{{ total_lights - on_count }}"
     
     # Only proceed if there are lights that are on to turn off
     - condition: template

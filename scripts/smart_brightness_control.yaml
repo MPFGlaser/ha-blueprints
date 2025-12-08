@@ -115,7 +115,12 @@ smart_brightness_control:
         sequence:
           - variables:
               current_brightness_pct: >-
-                {{ state_attr(repeat.item, 'brightness') | int(0) / 255 * 100 }}
+                {% set brightness = state_attr(repeat.item, 'brightness') %}
+                {% if brightness is not none %}
+                  {{ (brightness | int / 255 * 100) | round(1) }}
+                {% else %}
+                  {{ 100 }}
+                {% endif %}
               new_brightness_pct: >-
                 {{ [1, [100, current_brightness_pct + brightness_adjustment] | min] | max }}
               new_brightness_value: >-
